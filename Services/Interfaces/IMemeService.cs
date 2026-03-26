@@ -1,6 +1,6 @@
 ﻿using JokeApp.Models.DTOs;
 
-namespace JokeAppw.Services.Interfaces
+namespace JokeApp.Services.Interfaces
 {
     /// <summary>
     /// Contrato que define las operaciones disponibles para obtener
