@@ -92,7 +92,7 @@ JokeApp/
 
 ## Organización del equipo
 
-* Core (pantalla principal)
+* Módulo principal
 * Favoritos
 * Historial
 * Infraestructura (servicios, APIs, BD)
