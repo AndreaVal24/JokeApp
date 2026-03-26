@@ -3,10 +3,341 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:JokeApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="JokeHub — Tu dosis diaria de humor"
+        Height="620" Width="960"
+        MinHeight="560" MinWidth="820"
+        WindowStartupLocation="CenterScreen"
+        Background="#0A0F10"
+        BorderBrush="#C4A100"
+        BorderThickness="1">
 
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+
+        <!-- Botón navegación header -->
+        <Style x:Key="NavButtonStyle" TargetType="Button">
+            <Setter Property="Background"      Value="#1085A0"/>
+            <Setter Property="Foreground"      Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding"         Value="16,8"/>
+            <Setter Property="FontSize"        Value="13"/>
+            <Setter Property="FontWeight"      Value="SemiBold"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#0A6A80"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Botón amarillo: Generar Chiste -->
+        <Style x:Key="JokeButtonStyle" TargetType="Button">
+            <Setter Property="Background"      Value="#F5D200"/>
+            <Setter Property="Foreground"      Value="#0A0F10"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding"         Value="0,13"/>
+            <Setter Property="FontSize"        Value="14"/>
+            <Setter Property="FontWeight"      Value="Bold"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Opacity" Value="0.85"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#333"/>
+                                <Setter Property="Foreground" Value="#666"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Botón teal: Generar Meme -->
+        <Style x:Key="MemeButtonStyle" TargetType="Button">
+            <Setter Property="Background"      Value="#1085A0"/>
+            <Setter Property="Foreground"      Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding"         Value="0,13"/>
+            <Setter Property="FontSize"        Value="14"/>
+            <Setter Property="FontWeight"      Value="Bold"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Opacity" Value="0.85"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#333"/>
+                                <Setter Property="Foreground" Value="#666"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Botón outline: Guardar en Favoritos -->
+        <Style x:Key="OutlineButtonStyle" TargetType="Button">
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="Foreground"      Value="#AAAAAA"/>
+            <Setter Property="BorderBrush"     Value="#2A4A50"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding"         Value="0,9"/>
+            <Setter Property="FontSize"        Value="12"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background"  Value="#112226"/>
+                                <Setter Property="Foreground"  Value="White"/>
+                                <Setter Property="BorderBrush" Value="#1085A0"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground"  Value="#333"/>
+                                <Setter Property="BorderBrush" Value="#1A2A2E"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="65"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+
+        <!-- ══════════════ HEADER ══════════════ -->
+        <Border Grid.Row="0" Background="#0D1B1E">
+            <Border.BorderBrush>
+                <LinearGradientBrush StartPoint="0,1" EndPoint="1,1">
+                    <GradientStop Color="#C4A100" Offset="0"/>
+                    <GradientStop Color="#1085A0" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.BorderBrush>
+            <Border.BorderThickness>0,0,0,1</Border.BorderThickness>
+            <Grid Margin="22,0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="😂" FontSize="28" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBlock Text="JokeHub" FontSize="22" FontWeight="Bold"
+                               Foreground="White" VerticalAlignment="Center"/>
+                    <Rectangle Width="1" Fill="#2A4A50" Margin="14,12"/>
+                    <TextBlock Text="Tu dosis diaria de humor" FontSize="12"
+                               Foreground="#4A7A80" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                            VerticalAlignment="Center">
+                    <Button Content="★  Favoritos"
+                            Command="{Binding OpenFavoritesCommand}"
+                            Style="{StaticResource NavButtonStyle}"
+                            Margin="0,0,8,0"/>
+                    <Button Content="▦  Historial"
+                            Command="{Binding OpenHistoryCommand}"
+                            Style="{StaticResource NavButtonStyle}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ══════════════ CONTENIDO ══════════════ -->
+        <Grid Grid.Row="1" Margin="22,16,22,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="18"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ─── CARD CHISTE (borde teal) ─── -->
+            <Border Grid.Column="0"
+                    Background="#0F2226"
+                    CornerRadius="10"
+                    BorderBrush="#1085A0"
+                    BorderThickness="1.5">
+                <Border.Effect>
+                    <DropShadowEffect ShadowDepth="0" Color="#1085A0" Opacity="0.4" BlurRadius="18"/>
+                </Border.Effect>
+                <Grid Margin="18">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+                        <TextBlock Text="🎭" FontSize="18" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock Text="Chiste del Momento" FontSize="14" FontWeight="Bold"
+                                   Foreground="White" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <Border Grid.Row="1" Background="#091518" CornerRadius="8"
+                            BorderBrush="#1A3A40" BorderThickness="1" Padding="16">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <TextBlock Text="{Binding JokeText}"
+                                       TextWrapping="Wrap"
+                                       Foreground="#CCDDDF"
+                                       FontSize="13"
+                                       LineHeight="22"
+                                       TextAlignment="Center"
+                                       FontStyle="Italic"/>
+                        </ScrollViewer>
+                    </Border>
+
+                    <Button Grid.Row="2"
+                            Content="✦  Generar Chiste"
+                            Command="{Binding GetJokeCommand}"
+                            Style="{StaticResource JokeButtonStyle}"
+                            Height="44"
+                            Margin="0,12,0,0"/>
+
+                    <Button Grid.Row="3"
+                            Content="☆  Guardar en Favoritos"
+                            Command="{Binding SaveJokeAsFavoriteCommand}"
+                            IsEnabled="{Binding HasJoke}"
+                            Style="{StaticResource OutlineButtonStyle}"
+                            Height="36"
+                            Margin="0,6,0,0"/>
+                </Grid>
+            </Border>
+
+            <!-- ─── CARD MEME (borde dorado) ─── -->
+            <Border Grid.Column="2"
+                    Background="#0F2226"
+                    CornerRadius="10"
+                    BorderBrush="#C4A100"
+                    BorderThickness="1.5">
+                <Border.Effect>
+                    <DropShadowEffect ShadowDepth="0" Color="#C4A100" Opacity="0.4" BlurRadius="18"/>
+                </Border.Effect>
+                <Grid Margin="18">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+                        <TextBlock Text="🖼️" FontSize="18" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock Text="Meme Aleatorio" FontSize="14" FontWeight="Bold"
+                                   Foreground="White" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <Border Grid.Row="1" Background="#091518" CornerRadius="8"
+                            BorderBrush="#2A3A1A" BorderThickness="1" ClipToBounds="True">
+                        <Grid>
+                            <!-- Placeholder -->
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HasMeme}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <TextBlock Text="🖼" FontSize="48" HorizontalAlignment="Center"
+                                           Opacity="0.2" Margin="0,0,0,10"/>
+                                <TextBlock Text="Genera tu primer meme"
+                                           Foreground="#3A6A70" FontSize="12"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+
+                            <!-- Imagen -->
+                            <Image Source="{Binding MemeUrl}" Stretch="Uniform" Margin="10">
+                                <Image.Style>
+                                    <Style TargetType="Image">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HasMeme}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Image.Style>
+                            </Image>
+                        </Grid>
+                    </Border>
+
+                    <Button Grid.Row="2"
+                            Content="✦  Generar Meme"
+                            Command="{Binding GetMemeCommand}"
+                            Style="{StaticResource MemeButtonStyle}"
+                            Height="44"
+                            Margin="0,12,0,0"/>
+
+                    <Button Grid.Row="3"
+                            Content="☆  Guardar en Favoritos"
+                            Command="{Binding SaveMemeAsFavoriteCommand}"
+                            IsEnabled="{Binding HasMeme}"
+                            Style="{StaticResource OutlineButtonStyle}"
+                            Height="36"
+                            Margin="0,6,0,0"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ══════════════ BARRA DE ESTADO ══════════════ -->
+        <Border Grid.Row="2" Background="#070C0D" Padding="15,0">
+            <Grid>
+                <TextBlock Text="{Binding StatusMessage}"
+                           Foreground="#2A5A60" FontSize="11"
+                           VerticalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Text="Cargando..." Foreground="#2A5A60" FontSize="11"
+                               VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <ProgressBar IsIndeterminate="True" Width="80" Height="3"
+                                 Background="Transparent" Foreground="#1085A0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
 </Window>
