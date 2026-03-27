@@ -21,7 +21,7 @@ namespace JokeApp.Services.Interfaces
         /// Un <see cref="JokeDto"/> con el chiste procesado,
         /// o null si la API devuelve un error.
         /// </returns>
-        Task<JokeDto?> GetJokeAsync(string category);
+        Task<JokeDto?> GetJokeAsync(string category, string language = "en");
 
         /// <summary>
         /// Devuelve la lista de categorías disponibles en JokeAPI.

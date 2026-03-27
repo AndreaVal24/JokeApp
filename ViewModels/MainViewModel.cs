@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using HumorApp.Services;
-using JokeApp.Models.DTOs;
 using JokeApp.Services;
+using JokeApp.Models.DTOs;
 using JokeApp.Services.Interfaces;
 
 namespace JokeApp.ViewModels
