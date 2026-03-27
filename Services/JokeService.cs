@@ -64,7 +64,7 @@ namespace JokeApp.Services
         }
 
         /// <inheritdoc/>
-        public async Task<JokeDto?> GetJokeAsync(string category)
+        public async Task<JokeDto?> GetJokeAsync(string category, string language = "en")
         {
             try
             {
