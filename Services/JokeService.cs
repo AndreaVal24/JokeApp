@@ -4,7 +4,7 @@ using JokeApp.Services.Interfaces;
 using System.Net.Http;
 using System.Text.Json;
 
-namespace HumorApp.Services
+namespace JokeApp.Services
 {
     /// <summary>
     /// Implementación concreta de <see cref="IJokeService"/>.
@@ -64,11 +64,11 @@ namespace HumorApp.Services
         }
 
         /// <inheritdoc/>
-        public async Task<JokeDto?> GetJokeAsync(string category)
+        public async Task<JokeDto?> GetJokeAsync(string category, string language = "en")
         {
             try
             {
-                var url = $"{BaseUrl}/{Uri.EscapeDataString(category)}?type=single,twopart";
+                var url = $"{BaseUrl}/{Uri.EscapeDataString(category)}?lang={language}&type=single,twopart";
 
                 var response = await _httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();

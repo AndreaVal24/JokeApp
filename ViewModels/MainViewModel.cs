@@ -77,9 +77,7 @@ namespace JokeApp.ViewModels
                 {
                     JokeText = _currentJoke.Text;
                     HasJoke = true;
-                    StatusMessage = _selectedLanguage == "es"
-                        ? "Chiste cargado ✓ (nota: JokeAPI tiene pocos chistes en español)"
-                        : "Chiste cargado ✓";
+                    StatusMessage = "Chiste cargado ✓";
                 }
                 else
                 {
