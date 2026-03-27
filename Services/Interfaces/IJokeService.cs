@@ -1,4 +1,4 @@
-﻿using JokeApp.Models.DTOs;
+using JokeApp.Models.DTOs;
 
 
 namespace JokeApp.Services.Interfaces

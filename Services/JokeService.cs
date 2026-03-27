@@ -1,4 +1,4 @@
-﻿using JokeApp.Models.ApiResponses;
+using JokeApp.Models.ApiResponses;
 using JokeApp.Models.DTOs;
 using JokeApp.Services.Interfaces;
 using System.Net.Http;
@@ -68,7 +68,7 @@ namespace JokeApp.Services
         {
             try
             {
-                var url = $"{BaseUrl}/{Uri.EscapeDataString(category)}?type=single,twopart";
+                var url = $"{BaseUrl}/{Uri.EscapeDataString(category)}?lang={language}&type=single,twopart";
 
                 var response = await _httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();

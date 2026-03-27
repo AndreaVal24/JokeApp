@@ -1,4 +1,4 @@
-﻿using JokeApp.Models.ApiResponses;
+using JokeApp.Models.ApiResponses;
 using JokeApp.Models.DTOs;
 using JokeApp.Services.Interfaces;
 using System.Net.Http;
