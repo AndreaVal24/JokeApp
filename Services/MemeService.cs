@@ -1,10 +1,10 @@
-﻿using JokeApp.Models.ApiResponses;
+using JokeApp.Models.ApiResponses;
 using JokeApp.Models.DTOs;
-using JokeAppw.Services.Interfaces;
+using JokeApp.Services.Interfaces;
 using System.Net.Http;
 using System.Text.Json;
 
-namespace HumorApp.Services
+namespace JokeApp.Services
 {
     /// <summary>
     /// Implementación concreta de <see cref="IMemeService"/>.

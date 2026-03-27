@@ -1,6 +1,5 @@
-﻿using System.Net.Http;
+using System.Net.Http;
 using System.Windows;
-using HumorApp.Services;
 using JokeApp.Services;
 using JokeApp.ViewModels;
 

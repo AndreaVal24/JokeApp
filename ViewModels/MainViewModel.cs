@@ -1,10 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using HumorApp.Services;
 using JokeApp.Models.DTOs;
 using JokeApp.Services;
 using JokeApp.Services.Interfaces;
@@ -66,12 +65,8 @@ namespace JokeApp.ViewModels
             StatusMessage = "Obteniendo chiste...";
             try
             {
-                // La interfaz IJokeService solo acepta category por ahora.
-                // El idioma se maneja construyendo la categoria con prefijo de idioma
-                // cuando el servicio de Tomas soporte el parametro lang.
-                // TODO: cambiar a GetJokeAsync(SelectedCategory, _selectedLanguage)
-                // cuando Tomas actualice IJokeService para soportar idioma.
-                _currentJoke = await _jokeService.GetJokeAsync(SelectedCategory);
+                // Idioma activado: pasa _selectedLanguage a la API
+                _currentJoke = await _jokeService.GetJokeAsync(SelectedCategory, _selectedLanguage);
 
                 if (_currentJoke != null)
                 {
