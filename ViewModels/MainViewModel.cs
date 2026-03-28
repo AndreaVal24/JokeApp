@@ -1,10 +1,17 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using JokeApp.Data;
+using JokeApp.Models.DTOs;
 using JokeApp.Models;
+using JokeApp.Models.DTOs;
+using JokeApp.Services;
+using JokeApp.Services.Interfaces;
 using JokeApp.Services;
 using System;
 using System.Threading.Tasks;
 using System.Windows;
+using Microsoft.EntityFrameworkCore;
+ 
 
 namespace JokeApp.ViewModels
 {
@@ -14,6 +21,7 @@ namespace JokeApp.ViewModels
         // ─── Servicios inyectados desde el constructor ───────────────────────
         private readonly JokeService _jokeService;
         private readonly MemeService _memeService;
+        private readonly HistoryService _historyService;
         private readonly HistoryService _historyService;
         private readonly DatabaseService _databaseService;
 
@@ -47,6 +55,19 @@ namespace JokeApp.ViewModels
         [ObservableProperty]
         private bool _hasMeme = false;
 
+        [ObservableProperty]
+        private string _selectedCategory = "Any";
+
+        [ObservableProperty]
+        private IEnumerable<string> _availableCategories = new List<string>();
+
+        [ObservableProperty]
+        private string _languageButtonText = "EN";
+
+        // Idioma actual: "en" o "es"
+        private string _selectedLanguage = "en";
+
+        public MainViewModel(IJokeService jokeService, MemeService memeService, HistoryService historyService)
         // ─── Constructor ──────────────────────────────────────────────────────
         public MainViewModel(
             JokeService jokeService,
@@ -56,6 +77,8 @@ namespace JokeApp.ViewModels
         {
             _jokeService = jokeService;
             _memeService = memeService;
+            _historyService = historyService;
+            AvailableCategories = _jokeService.GetAvailableCategories();
             _historyService = historyService;
             _databaseService = databaseService;
         }
@@ -78,6 +101,18 @@ namespace JokeApp.ViewModels
                 // Registrar en historial automáticamente
                 if (_currentJoke != null)
                 {
+                    JokeText = _currentJoke.Text;
+                    HasJoke = true;
+                    StatusMessage = "Chiste cargado ✓";
+
+                    // Guardar en historial
+                    await _historyService.AddAsync("joke", _currentJoke.Id.ToString(), _currentJoke.Text);
+                }
+                else
+                {
+                    JokeText = "No se pudo obtener el chiste. Intenta de nuevo.";
+                    HasJoke = false;
+                    StatusMessage = "Sin respuesta de la API";
                     await _historyService.AddAsync(new HistoryItem
                     {
                         Content = JokeText,
@@ -114,6 +149,17 @@ namespace JokeApp.ViewModels
                 // Registrar en historial automáticamente
                 if (_currentMeme != null)
                 {
+                    MemeUrl = _currentMeme.Url;
+                    MemeName = _currentMeme.Name;
+                    HasMeme = true;
+                    StatusMessage = "Meme cargado ✓";
+                    // Guardar en historial
+                    await _historyService.AddAsync("meme", _currentMeme.Id, _currentMeme.Name);
+                }
+                else
+                {
+                    HasMeme = false;
+                    StatusMessage = "Sin respuesta de la API";
                     await _historyService.AddAsync(new HistoryItem
                     {
                         Content = MemeUrl,
@@ -174,9 +220,12 @@ namespace JokeApp.ViewModels
             }
         }
 
+        
         [RelayCommand]
         private void OpenFavorites()
         {
+            // TODO: cuando Persona 2 suba su vista
+            MessageBox.Show("Vista de Favoritos en construccion.", "JokeHub");
             // TODO: Cuando Persona 2 suba FavoritesView.xaml, reemplaza el MessageBox con:
             // var view = new Views.FavoritesView();
             // view.Show();
@@ -186,6 +235,11 @@ namespace JokeApp.ViewModels
         [RelayCommand]
         private void OpenHistory()
         {
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+           .UseSqlite("Data Source=app.db")
+           .Options;
+            var context = new AppDbContext(options);
+            new Views.HistoryView(context).Show();
             // TODO: Cuando Persona 3 suba HistoryView.xaml, reemplaza el MessageBox con:
             // var view = new Views.HistoryView();
             // view.Show();
