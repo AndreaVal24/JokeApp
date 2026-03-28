@@ -1,6 +1,11 @@
-﻿using JokeApp.Services;
-using JokeApp.ViewModels;
+﻿using System.Net.Http;
 using System.Windows;
+using HumorApp.Services;
+using JokeApp.Data;
+using JokeApp.Services;
+using JokeApp.Services.Interfaces;
+using JokeApp.ViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace JokeApp
 {
@@ -10,15 +15,19 @@ namespace JokeApp
         {
             InitializeComponent();
 
-            // Aqui se crean los servicios y se conectan al ViewModel.
-            // Estos van a mostrar errores hasta que tus compañeros suban sus archivos.
-            // Eso es normal — no te preocupes por eso ahora.
-            var jokeService = new JokeService();
-            var memeService = new MemeService();
-            var historyService = new HistoryService();
-            var databaseService = new DatabaseService();
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseSqlite("Data Source=app.db")
+                .Options;
 
-            DataContext = new MainViewModel(jokeService, memeService, historyService, databaseService);
+            var context = new AppDbContext(options);
+            context.Database.EnsureCreated();
+
+            var httpClient = new HttpClient();
+            IJokeService jokeService = new JokeService(httpClient);
+            var memeService = new MemeService(httpClient);
+            var historyService = new HistoryService(context);
+
+            DataContext = new MainViewModel(jokeService, memeService, historyService);
         }
     }
 }

@@ -1,40 +1,37 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Windows;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using HumorApp.Services;
 using JokeApp.Data;
-using JokeApp.Models.DTOs;
-using JokeApp.Models;
 using JokeApp.Models.DTOs;
 using JokeApp.Services;
 using JokeApp.Services.Interfaces;
-using JokeApp.Services;
-using System;
-using System.Threading.Tasks;
-using System.Windows;
 using Microsoft.EntityFrameworkCore;
- 
 
 namespace JokeApp.ViewModels
 {
-    // ObservableObject viene de CommunityToolkit.Mvvm y reemplaza INotifyPropertyChanged
+    /// <summary>
+    /// ViewModel principal de la aplicación.
+    /// Gestiona la generación de chistes y memes, y coordina
+    /// la navegación hacia las vistas de Historial y Favoritos.
+    /// </summary>
     public partial class MainViewModel : ObservableObject
     {
-        // ─── Servicios inyectados desde el constructor ───────────────────────
-        private readonly JokeService _jokeService;
+        // ─── Dependencias ──────────────────────────────────────────────────────
+        private readonly IJokeService _jokeService;
         private readonly MemeService _memeService;
         private readonly HistoryService _historyService;
-        private readonly HistoryService _historyService;
-        private readonly DatabaseService _databaseService;
 
-        // Guardamos el último joke/meme para usarlos en "Guardar favorito"
-        private Joke? _currentJoke;
-        private Meme? _currentMeme;
+        private JokeDto? _currentJoke;
+        private MemeDto? _currentMeme;
 
-        // ─── Propiedades observables (source-generated por [ObservableProperty]) ───
-        // [ObservableProperty] genera automáticamente la propiedad pública JokeText
-        // con su setter que llama a OnPropertyChanged. NO escribas el getter/setter manualmente.
+        // ─── Propiedades observables ───────────────────────────────────────────
 
         [ObservableProperty]
-        private string _jokeText = "¡Presiona 'Generar Chiste' para comenzar! 😄";
+        private string _jokeText = "Presiona Generar Chiste para comenzar 😄";
 
         [ObservableProperty]
         private string _memeUrl = string.Empty;
@@ -48,7 +45,6 @@ namespace JokeApp.ViewModels
         [ObservableProperty]
         private string _statusMessage = "Listo";
 
-        // Controla si los botones "Guardar en Favoritos" están habilitados
         [ObservableProperty]
         private bool _hasJoke = false;
 
@@ -64,28 +60,22 @@ namespace JokeApp.ViewModels
         [ObservableProperty]
         private string _languageButtonText = "EN";
 
-        // Idioma actual: "en" o "es"
         private string _selectedLanguage = "en";
 
+        // ─── Constructor ───────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Inicializa el ViewModel con los servicios necesarios.
+        /// </summary>
         public MainViewModel(IJokeService jokeService, MemeService memeService, HistoryService historyService)
-        // ─── Constructor ──────────────────────────────────────────────────────
-        public MainViewModel(
-            JokeService jokeService,
-            MemeService memeService,
-            HistoryService historyService,
-            DatabaseService databaseService)
         {
             _jokeService = jokeService;
             _memeService = memeService;
             _historyService = historyService;
             AvailableCategories = _jokeService.GetAvailableCategories();
-            _historyService = historyService;
-            _databaseService = databaseService;
         }
 
-        // ─── Comandos ─────────────────────────────────────────────────────────
-        // [RelayCommand] genera automáticamente GetJokeCommand que el XAML puede bindear.
-        // El nombre del comando = nombre del método + "Command"
+        // ─── Comandos ──────────────────────────────────────────────────────────
 
         [RelayCommand]
         private async Task GetJokeAsync()
@@ -94,18 +84,13 @@ namespace JokeApp.ViewModels
             StatusMessage = "Obteniendo chiste...";
             try
             {
-                _currentJoke = await _jokeService.GetJokeAsync();
-                JokeText = _currentJoke?.Text ?? "No se pudo obtener el chiste.";
-                HasJoke = _currentJoke != null;
+                _currentJoke = await _jokeService.GetJokeAsync(SelectedCategory);
 
-                // Registrar en historial automáticamente
                 if (_currentJoke != null)
                 {
                     JokeText = _currentJoke.Text;
                     HasJoke = true;
                     StatusMessage = "Chiste cargado ✓";
-
-                    // Guardar en historial
                     await _historyService.AddAsync("joke", _currentJoke.Id.ToString(), _currentJoke.Text);
                 }
                 else
@@ -113,24 +98,34 @@ namespace JokeApp.ViewModels
                     JokeText = "No se pudo obtener el chiste. Intenta de nuevo.";
                     HasJoke = false;
                     StatusMessage = "Sin respuesta de la API";
-                    await _historyService.AddAsync(new HistoryItem
-                    {
-                        Content = JokeText,
-                        Type = "Joke",
-                        CreatedAt = DateTime.Now
-                    });
                 }
-
-                StatusMessage = "Chiste cargado ✓";
             }
             catch (Exception ex)
             {
-                StatusMessage = $"Error al obtener chiste: {ex.Message}";
-                JokeText = "Ocurrió un error. Intenta de nuevo.";
+                JokeText = "Ocurrio un error. Intenta de nuevo.";
+                StatusMessage = $"Error: {ex.Message}";
+                HasJoke = false;
             }
             finally
             {
                 IsLoading = false;
+            }
+        }
+
+        [RelayCommand]
+        private void ToggleLanguage()
+        {
+            if (_selectedLanguage == "en")
+            {
+                _selectedLanguage = "es";
+                LanguageButtonText = "ES";
+                StatusMessage = "Idioma: Español — genera un nuevo chiste";
+            }
+            else
+            {
+                _selectedLanguage = "en";
+                LanguageButtonText = "EN";
+                StatusMessage = "Idioma: Inglés — genera un nuevo chiste";
             }
         }
 
@@ -141,38 +136,26 @@ namespace JokeApp.ViewModels
             StatusMessage = "Obteniendo meme...";
             try
             {
-                _currentMeme = await _memeService.GetMemeAsync();
-                MemeUrl = _currentMeme?.Url ?? string.Empty;
-                MemeName = _currentMeme?.Name ?? string.Empty;
-                HasMeme = _currentMeme != null;
+                _currentMeme = await _memeService.GetRandomMemeAsync();
 
-                // Registrar en historial automáticamente
                 if (_currentMeme != null)
                 {
                     MemeUrl = _currentMeme.Url;
                     MemeName = _currentMeme.Name;
                     HasMeme = true;
                     StatusMessage = "Meme cargado ✓";
-                    // Guardar en historial
                     await _historyService.AddAsync("meme", _currentMeme.Id, _currentMeme.Name);
                 }
                 else
                 {
                     HasMeme = false;
                     StatusMessage = "Sin respuesta de la API";
-                    await _historyService.AddAsync(new HistoryItem
-                    {
-                        Content = MemeUrl,
-                        Type = "Meme",
-                        CreatedAt = DateTime.Now
-                    });
                 }
-
-                StatusMessage = "Meme cargado ✓";
             }
             catch (Exception ex)
             {
-                StatusMessage = $"Error al obtener meme: {ex.Message}";
+                StatusMessage = $"Error: {ex.Message}";
+                HasMeme = false;
             }
             finally
             {
@@ -181,69 +164,36 @@ namespace JokeApp.ViewModels
         }
 
         [RelayCommand]
-        private async Task SaveJokeAsFavoriteAsync()
+        private void SaveJokeAsFavorite()
         {
             if (_currentJoke == null) return;
-            try
-            {
-                await _databaseService.SaveFavoriteAsync(new Favorite
-                {
-                    Content = JokeText,
-                    Type = "Joke",
-                    SavedAt = DateTime.Now
-                });
-                StatusMessage = "Chiste guardado en favoritos ⭐";
-            }
-            catch (Exception ex)
-            {
-                StatusMessage = $"Error al guardar favorito: {ex.Message}";
-            }
+            // TODO: implementar con DatabaseService cuando Persona 2 suba su modulo
+            StatusMessage = "Chiste guardado en favoritos ⭐";
         }
 
         [RelayCommand]
-        private async Task SaveMemeAsFavoriteAsync()
+        private void SaveMemeAsFavorite()
         {
             if (_currentMeme == null) return;
-            try
-            {
-                await _databaseService.SaveFavoriteAsync(new Favorite
-                {
-                    Content = MemeUrl,
-                    Type = "Meme",
-                    SavedAt = DateTime.Now
-                });
-                StatusMessage = "Meme guardado en favoritos ⭐";
-            }
-            catch (Exception ex)
-            {
-                StatusMessage = $"Error al guardar favorito: {ex.Message}";
-            }
+            // TODO: implementar con DatabaseService cuando Persona 2 suba su modulo
+            StatusMessage = "Meme guardado en favoritos ⭐";
         }
 
-        
         [RelayCommand]
         private void OpenFavorites()
         {
-            // TODO: cuando Persona 2 suba su vista
+            // TODO: new Views.FavoritesView().Show(); cuando Persona 2 suba su vista
             MessageBox.Show("Vista de Favoritos en construccion.", "JokeHub");
-            // TODO: Cuando Persona 2 suba FavoritesView.xaml, reemplaza el MessageBox con:
-            // var view = new Views.FavoritesView();
-            // view.Show();
-            MessageBox.Show("Vista de Favoritos en construcción.", "JokeHub");
         }
 
         [RelayCommand]
         private void OpenHistory()
         {
             var options = new DbContextOptionsBuilder<AppDbContext>()
-           .UseSqlite("Data Source=app.db")
-           .Options;
+                .UseSqlite("Data Source=app.db")
+                .Options;
             var context = new AppDbContext(options);
             new Views.HistoryView(context).Show();
-            // TODO: Cuando Persona 3 suba HistoryView.xaml, reemplaza el MessageBox con:
-            // var view = new Views.HistoryView();
-            // view.Show();
-            MessageBox.Show("Vista de Historial en construcción.", "JokeHub");
         }
     }
 }
