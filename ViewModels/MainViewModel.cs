@@ -1,23 +1,34 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using HumorApp.Services;
+using JokeApp.Data;
 using JokeApp.Models.DTOs;
 using JokeApp.Services;
-using JokeApp.Models.DTOs;
 using JokeApp.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace JokeApp.ViewModels
 {
+    /// <summary>
+    /// ViewModel principal de la aplicación.
+    /// Gestiona la generación de chistes y memes, y coordina
+    /// la navegación hacia las vistas de Historial y Favoritos.
+    /// </summary>
     public partial class MainViewModel : ObservableObject
     {
+        // ─── Dependencias ──────────────────────────────────────────────────────
         private readonly IJokeService _jokeService;
         private readonly MemeService _memeService;
+        private readonly HistoryService _historyService;
 
         private JokeDto? _currentJoke;
         private MemeDto? _currentMeme;
+
+        // ─── Propiedades observables ───────────────────────────────────────────
 
         [ObservableProperty]
         private string _jokeText = "Presiona Generar Chiste para comenzar 😄";
@@ -49,15 +60,22 @@ namespace JokeApp.ViewModels
         [ObservableProperty]
         private string _languageButtonText = "EN";
 
-        // Idioma actual: "en" o "es"
         private string _selectedLanguage = "en";
 
-        public MainViewModel(IJokeService jokeService, MemeService memeService)
+        // ─── Constructor ───────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Inicializa el ViewModel con los servicios necesarios.
+        /// </summary>
+        public MainViewModel(IJokeService jokeService, MemeService memeService, HistoryService historyService)
         {
             _jokeService = jokeService;
             _memeService = memeService;
+            _historyService = historyService;
             AvailableCategories = _jokeService.GetAvailableCategories();
         }
+
+        // ─── Comandos ──────────────────────────────────────────────────────────
 
         [RelayCommand]
         private async Task GetJokeAsync()
@@ -66,14 +84,14 @@ namespace JokeApp.ViewModels
             StatusMessage = "Obteniendo chiste...";
             try
             {
-                // Idioma activado: pasa _selectedLanguage a la API
-                _currentJoke = await _jokeService.GetJokeAsync(SelectedCategory, _selectedLanguage);
+                _currentJoke = await _jokeService.GetJokeAsync(SelectedCategory);
 
                 if (_currentJoke != null)
                 {
                     JokeText = _currentJoke.Text;
                     HasJoke = true;
                     StatusMessage = "Chiste cargado ✓";
+                    await _historyService.AddAsync("joke", _currentJoke.Id.ToString(), _currentJoke.Text);
                 }
                 else
                 {
@@ -101,13 +119,13 @@ namespace JokeApp.ViewModels
             {
                 _selectedLanguage = "es";
                 LanguageButtonText = "ES";
-                StatusMessage = "Idioma: Espanol — genera un nuevo chiste";
+                StatusMessage = "Idioma: Español — genera un nuevo chiste";
             }
             else
             {
                 _selectedLanguage = "en";
                 LanguageButtonText = "EN";
-                StatusMessage = "Idioma: Ingles — genera un nuevo chiste";
+                StatusMessage = "Idioma: Inglés — genera un nuevo chiste";
             }
         }
 
@@ -126,6 +144,7 @@ namespace JokeApp.ViewModels
                     MemeName = _currentMeme.Name;
                     HasMeme = true;
                     StatusMessage = "Meme cargado ✓";
+                    await _historyService.AddAsync("meme", _currentMeme.Id, _currentMeme.Name);
                 }
                 else
                 {
@@ -170,8 +189,11 @@ namespace JokeApp.ViewModels
         [RelayCommand]
         private void OpenHistory()
         {
-            // TODO: new Views.HistoryView().Show(); cuando Persona 3 suba su vista
-            MessageBox.Show("Vista de Historial en construccion.", "JokeHub");
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseSqlite("Data Source=app.db")
+                .Options;
+            var context = new AppDbContext(options);
+            new Views.HistoryView(context).Show();
         }
     }
 }
