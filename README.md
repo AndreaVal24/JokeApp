@@ -102,4 +102,4 @@ JokeApp/
 
 ## Estado del proyecto
 
-En desarrollo 🚧
+Completado
