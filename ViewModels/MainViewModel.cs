@@ -4,12 +4,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using HumorApp.Services;
 using JokeApp.Data;
 using JokeApp.Models.DTOs;
 using JokeApp.Services;
 using JokeApp.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace JokeApp.ViewModels
 {
@@ -22,8 +20,10 @@ namespace JokeApp.ViewModels
     {
         // ─── Dependencias ──────────────────────────────────────────────────────
         private readonly IJokeService _jokeService;
-        private readonly MemeService _memeService;
+        private readonly IMemeService _memeService;
         private readonly HistoryService _historyService;
+        private readonly DatabaseService _databaseService;
+        private readonly AppDbContext _context;
 
         private JokeDto? _currentJoke;
         private MemeDto? _currentMeme;
@@ -67,11 +67,18 @@ namespace JokeApp.ViewModels
         /// <summary>
         /// Inicializa el ViewModel con los servicios necesarios.
         /// </summary>
-        public MainViewModel(IJokeService jokeService, MemeService memeService, HistoryService historyService)
+        public MainViewModel(
+            IJokeService jokeService,
+            IMemeService memeService,
+            HistoryService historyService,
+            DatabaseService databaseService,
+            AppDbContext context)
         {
             _jokeService = jokeService;
             _memeService = memeService;
             _historyService = historyService;
+            _databaseService = databaseService;
+            _context = context;
             AvailableCategories = _jokeService.GetAvailableCategories();
         }
 
@@ -84,7 +91,7 @@ namespace JokeApp.ViewModels
             StatusMessage = "Obteniendo chiste...";
             try
             {
-                _currentJoke = await _jokeService.GetJokeAsync(SelectedCategory);
+                _currentJoke = await _jokeService.GetJokeAsync(SelectedCategory, _selectedLanguage);
 
                 if (_currentJoke != null)
                 {
@@ -167,33 +174,58 @@ namespace JokeApp.ViewModels
         private void SaveJokeAsFavorite()
         {
             if (_currentJoke == null) return;
-            // TODO: implementar con DatabaseService cuando Persona 2 suba su modulo
-            StatusMessage = "Chiste guardado en favoritos ⭐";
+
+            _ = SaveJokeFavoriteAsync();
         }
 
         [RelayCommand]
         private void SaveMemeAsFavorite()
         {
             if (_currentMeme == null) return;
-            // TODO: implementar con DatabaseService cuando Persona 2 suba su modulo
-            StatusMessage = "Meme guardado en favoritos ⭐";
+
+            _ = SaveMemeFavoriteAsync();
         }
 
         [RelayCommand]
         private void OpenFavorites()
         {
-            // TODO: new Views.FavoritesView().Show(); cuando Persona 2 suba su vista
-            MessageBox.Show("Vista de Favoritos en construccion.", "JokeHub");
+            new global::JokeApp.Views.FavoritesView(_context).Show();
         }
 
         [RelayCommand]
         private void OpenHistory()
         {
-            var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlite("Data Source=app.db")
-                .Options;
-            var context = new AppDbContext(options);
-            new Views.HistoryView(context).Show();
+            new global::JokeApp.Views.HistoryView(_context).Show();
+        }
+
+        private async Task SaveJokeFavoriteAsync()
+        {
+            try
+            {
+                var isNew = await _databaseService.SaveJokeAsync(_currentJoke!);
+                StatusMessage = isNew
+                    ? "Chiste guardado en favoritos ⭐"
+                    : "Chiste ya estaba en favoritos";
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error al guardar favorito: {ex.Message}";
+            }
+        }
+
+        private async Task SaveMemeFavoriteAsync()
+        {
+            try
+            {
+                var isNew = await _databaseService.SaveMemeAsync(_currentMeme!);
+                StatusMessage = isNew
+                    ? "Meme guardado en favoritos ⭐"
+                    : "Meme ya estaba en favoritos";
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error al guardar favorito: {ex.Message}";
+            }
         }
     }
 }
