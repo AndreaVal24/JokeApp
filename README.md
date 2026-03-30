@@ -59,16 +59,20 @@ Aplicación de escritorio en WPF que permite generar chistes, mostrar memes y ge
 ---
 
 
-## Descargar 
+## Descargar e Instalar
 
 ### Opción 1: Ejecutable (Recomendado)
 
 1. Ve a la sección **Releases** en este repositorio
 2. Descarga la última versión: `JokeApp-v1.0.zip`
 3. Extrae el archivo
-4. Ejecuta `Setup`
-5. La aplicación se abrirá automáticamente
+4. Ejecuta `JokeApp`
+5. Sigue las instrucciones del instalador
 
+Una vez instalada:
+
+La aplicación se abrirá automáticamente
+También puedes ejecutarla desde el acceso directo creado en el sistema
 
 ### Opción 2: Desde el código fuente
 
