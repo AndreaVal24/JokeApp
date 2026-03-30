@@ -59,7 +59,7 @@ Aplicación de escritorio en WPF que permite generar chistes, mostrar memes y ge
 ---
 
 
-## 📥 Descargar y Ejecutar
+## Descargar y Ejecutar
 
 ### Opción 1: Ejecutable (Recomendado)
 
