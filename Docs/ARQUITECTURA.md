@@ -219,8 +219,3 @@ JokeApp/
     └── AppDbContext.cs
 
 ```
-
-## Diagrama de Arquitectura
-
-![Diagrama de arquitectura JokeApp](images/arquitectura_diagrama.png)
-```
