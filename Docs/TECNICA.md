@@ -18,10 +18,8 @@ Se eligió WPF (Windows Presentation Foundation) porque:
 
 **Comunidad activa:** Hay amplio ecosistema de librerías y documentación disponible.
 
-**Alternativas rechazadas:**
+**Alternativa rechazada:**
 - Winforms: Más antigua, soporte limitado para MVVM, menos mantenible a largo plazo
-- Avalonia: Requiere aprendizaje adicional, menos documentación en español
-- Blazor/Web: Overkill para aplicación de escritorio, requiere servidor
 
 ---
 
