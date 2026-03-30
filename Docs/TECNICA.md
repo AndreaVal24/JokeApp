@@ -242,55 +242,8 @@ Documentación técnica (este proyecto).
 
 ---
 
-## 8. Ciclo de Vida de Obtener un Chiste
 
-**Flujo técnico completo:**
-
-```
-1. Usuario presiona botón en MainWindow.xaml
-
-2. XAML invoca: Command="{Binding GetJokeAsyncCommand}"
-
-3. RelayCommand ejecuta MainViewModel.GetJokeAsync()
-
-4. IsLoading = true (UI muestra spinner automáticamente)
-
-5. MainViewModel invoca JokeService.GetJokeAsync("Programming")
-
-6. JokeService construye URL:
-   https://v2.jokeapi.dev/joke/Programming?lang=en&type=single,twopart
-
-7. HttpClient realiza GET
-
-8. Response JSON se deserializa a objeto Joke
-
-9. JokeService mapea Joke → JokeDto (resuelve single/twopart)
-
-10. JokeDto retorna a MainViewModel
-
-11. MainViewModel actualiza propiedad JokeText
-
-12. MainViewModel invoca HistoryService.AddAsync()
-
-13. HistoryService crea HistoryItem en BD
-
-14. AppDbContext.SaveChangesAsync() persiste en SQLite
-
-15. IsLoading = false (UI quita spinner)
-
-16. MainWindow.xaml actualiza TextBlock (data binding)
-    Automáticamente refleja JokeText nuevo
-```
-
-**Puntos clave:**
-
-- Sin thread blocking: async/await mantiene UI responsiva
-- Sin código en code-behind: Todo desde ViewModel
-- Separación clara: Cada capa tiene responsabilidad
-
----
-
-## 9. Inyección de Dependencias
+## 8. Inyección de Dependencias
 
 **Cómo funciona en el proyecto:**
 
@@ -339,7 +292,7 @@ public MainWindow()
 
 ---
 
-## 10. Problemas y Soluciones
+## 9. Problemas y Soluciones
 
 ### Problema 1: Contexto múltiple de BD
 
@@ -393,7 +346,7 @@ Si API cambia, solo JokeService se modifica. ViewModel sigue igual.
 
 ---
 
-## 11. Estructura de Base de Datos
+## 10. Estructura de Base de Datos
 
 ### Tabla HistoryItems
 
@@ -431,7 +384,7 @@ CREATE TABLE Favorites (
 
 ---
 
-## 12. Configuración de Compilación
+## 11. Configuración de Compilación
 
 **.csproj:**
 - Target Framework: net8.0
@@ -443,7 +396,7 @@ CREATE TABLE Favorites (
 
 ---
 
-## 13. Notas Importantes
+## 12. Notas Importantes
 
 **Contexto de BD compartido:** AppDbContext se crea una sola vez en MainWindow y se pasa a todos los servicios. No crear nuevos contextos en cada vista.
 
