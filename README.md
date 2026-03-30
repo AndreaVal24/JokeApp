@@ -14,6 +14,7 @@ Aplicación de escritorio en WPF que permite generar chistes, mostrar memes y ge
 
 ---
 
+
 ## Tecnologías utilizadas
 
 * C# (.NET)
@@ -24,6 +25,7 @@ Aplicación de escritorio en WPF que permite generar chistes, mostrar memes y ge
 * Consumo de APIs REST
 
 ---
+
 
 ## APIs utilizadas
 
@@ -37,21 +39,6 @@ Aplicación de escritorio en WPF que permite generar chistes, mostrar memes y ge
 
 ---
 
-## Arquitectura del proyecto
-
-Patrón **MVVM**:
-
-```plaintext
-JokeApp/
-│
-├── Views/          → Interfaces (XAML)
-├── ViewModels/     → Lógica de presentación
-├── Models/         → Entidades (Joke, Favorite, History)
-├── Services/       → Lógica de negocio (APIs, BD)
-├── Data/           → DbContext (SQLite)
-```
-
----
 
 ## Principios aplicados
 
@@ -62,6 +49,7 @@ JokeApp/
 
 ---
 
+
 ## Base de datos
 
 * SQLite (archivo local)
@@ -70,16 +58,32 @@ JokeApp/
 
 ---
 
-## ⚙️ ¿Cómo ejecutar el proyecto?
 
-1. Clonar el repositorio
-2. Abrir en Visual Studio
-3. Ejecutar (`F5`)
+## 📥 Descargar y Ejecutar
 
-✔ No requiere instalación adicional
-✔ La base de datos se genera automáticamente
+### Opción 1: Ejecutable (Recomendado)
+
+1. Ve a la sección **Releases** en este repositorio
+2. Descarga la última versión: `JokeApp-v1.0.zip`
+3. Extrae el archivo
+4. Ejecuta `JokeApp.exe`
+
+✔ No requiere instalación  
+✔ No requiere .NET 8 preinstalado  
+✔ Funciona automáticamente
+
+### Opción 2: Desde el código fuente
+
+1. Clona el repositorio:
+```bash
+   git clone https://github.com/AndreaVal24/JokeApp.git
+```
+2. Abre `JokeApp.sln` en Visual Studio
+3. Presiona `F5` para ejecutar
+4. La base de datos se genera automáticamente
 
 ---
+
 
 ## ¿Cómo probar la aplicación?
 
@@ -89,6 +93,7 @@ JokeApp/
 * Revisar historial de uso
 
 ---
+
 
 ## Organización del equipo
 
